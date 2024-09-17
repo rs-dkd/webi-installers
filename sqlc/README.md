@@ -65,6 +65,24 @@ install:
 
 #### JSON
 
+```yaml
+version: '2'
+plugins:
+  - name: ts
+    wasm:
+      url: https://downloads.sqlc.dev/plugin/sqlc-gen-typescript_0.1.3.wasm
+      sha256: 287df8f6cc06377d67ad5ba02c9e0f00c585509881434d15ea8bd9fc751a9368
+sql:
+  - engine: 'postgresql'
+    schema: './sql/migrations/'
+    queries: './sql/queries/'
+    gen:
+      json:
+        out: './db/json/'
+        filename: 'db.json'
+        indent: '  '
+```
+
 See:
 
 - <https://docs.sqlc.dev/en/latest/reference/config.html#json>
@@ -139,8 +157,8 @@ sd --flags m '([^\n])\n/\*\*' '$1\n\n/**' ./db/*.js
 ** with js**:
 
 ```js
-let Fs = require("fs/promises");
-let Path = require("path");
+let Fs = require('fs/promises');
+let Path = require('path');
 
 async function main() {
   // ex: ./db/
@@ -149,25 +167,25 @@ async function main() {
 
   let entries = await Fs.readdir(dir);
   for (let entry of entries) {
-    let isJs = entry.endsWith(".js");
+    let isJs = entry.endsWith('.js');
     if (!isJs) {
       continue;
     }
     console.log(`processing ${entry}`);
 
     let path = Path.join(dir, entry);
-    let js = await Fs.readFile(path, "utf8");
+    let js = await Fs.readFile(path, 'utf8');
 
-    js = js.replace(/(.*@import.*)/, "$1\n\nlet Queries = module.exports;");
-    js = js.replace(/export const (\w+) =/g, "\nQueries.$1 =");
-    js = js.replace(/ (\w+Query)\b/g, " Queries.$1");
+    js = js.replace(/(.*@import.*)/, '$1\n\nlet Queries = module.exports;');
+    js = js.replace(/export const (\w+) =/g, '\nQueries.$1 =');
+    js = js.replace(/ (\w+Query)\b/g, ' Queries.$1');
     js = js.replace(
       /export async function (\w+)/g,
-      "Queries.$1 = async function ",
+      'Queries.$1 = async function ',
     );
-    js = js.replace(/([^\n])\n\/\*\*/gm, "$1\n\n/**");
+    js = js.replace(/([^\n])\n\/\*\*/gm, '$1\n\n/**');
 
-    await Fs.writeFile(path, js, "utf8");
+    await Fs.writeFile(path, js, 'utf8');
   }
 }
 
