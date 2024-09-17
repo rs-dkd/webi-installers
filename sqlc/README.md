@@ -136,6 +136,44 @@ sd 'export async function (\w+)' 'Queries.$1 = async function ' ./db/*.js
 sd --flags m '([^\n])\n/\*\*' '$1\n\n/**' ./db/*.js
 ```
 
+** with js**:
+
+```js
+let Fs = require("fs/promises");
+let Path = require("path");
+
+async function main() {
+  // ex: ./db/
+  let dir = process.argv[2];
+  // let namespace = process.argv[3]; // 'Queries' for now
+
+  let entries = await Fs.readdir(dir);
+  for (let entry of entries) {
+    let isJs = entry.endsWith(".js");
+    if (!isJs) {
+      continue;
+    }
+    console.log(`processing ${entry}`);
+
+    let path = Path.join(dir, entry);
+    let js = await Fs.readFile(path, "utf8");
+
+    js = js.replace(/(.*@import.*)/, "$1\n\nlet Queries = module.exports;");
+    js = js.replace(/export const (\w+) =/g, "\nQueries.$1 =");
+    js = js.replace(/ (\w+Query)\b/g, " Queries.$1");
+    js = js.replace(
+      /export async function (\w+)/g,
+      "Queries.$1 = async function ",
+    );
+    js = js.replace(/([^\n])\n\/\*\*/gm, "$1\n\n/**");
+
+    await Fs.writeFile(path, js, "utf8");
+  }
+}
+
+main();
+```
+
 **with vim**:
 
 ```vim
