@@ -231,7 +231,7 @@ Supported shells include:
 
 ```sh
 sqlc completion fish | source &&
-    echo 'sqlc completion fish | source' >> ~/.config/fish/config.fish
+    echo 'status is-interactive ; and sqlc completion fish | source' >> ~/.config/fish/config.fish
 ```
 
 ### zsh
